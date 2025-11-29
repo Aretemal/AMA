@@ -1,23 +1,25 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import CompositionApiPage from '@/views/CompositionApiPage.vue'
-import OptionsApiPage from '@/views/OptionsApiPage.vue'
+
+import Home from '@/views/HomePage.vue'
+import MyArticles from '@/views/MyArticlesPage.vue'
+import Settings from '@/views/SettingsPage.vue'
+
+import { AppRoutes } from '../constants/appRoutes'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
-      path: '/composition',
-      name: 'composition',
-      component: CompositionApiPage,
+      path: AppRoutes.HOME,
+      component: Home,
     },
     {
-      path: '/options',
-      name: 'options',
-      component: OptionsApiPage,
+      path: AppRoutes.MY_ARTICLES,
+      component: MyArticles,
     },
     {
-      path: '/',
-      redirect: '/composition',
+      path: AppRoutes.SETTINGS,
+      component: Settings,
     },
   ],
 })
