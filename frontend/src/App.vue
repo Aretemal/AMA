@@ -7,7 +7,7 @@ import AppFooter from './widgets/AppFooter.vue';
 <template>
   <div id="app">
     <AppHeader />
-    <main class="flex-1">
+    <main class="flex-1 w-full px-10 py-4">
       <RouterView />
     </main>
     <AppFooter />
@@ -17,6 +17,7 @@ import AppFooter from './widgets/AppFooter.vue';
 <style scoped>
 #app {
   min-height: 100vh;
+  width: 100%;
   display: flex;
   flex-direction: column;
   background: #fafafa;
