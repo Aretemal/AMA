@@ -12,6 +12,9 @@ const links = [
   {
     to: AppRoutes.MY_ARTICLES,
     label: 'My Articles',
+    children: [
+      AppRoutes.CREATE_ARTICLE,
+    ]
   },
   {
     to: AppRoutes.SETTINGS,
@@ -33,7 +36,7 @@ const isActive = (to: string) => {
       :to="link.to"
       :class="[
         'p-4 inline-block',
-        isActive(link.to) ? 'text-black bg-gray-100' : 'text-gray-500'
+        isActive(link.to) || link?.children?.includes?.(route.path) ? 'text-black bg-gray-100' : 'text-gray-500'
       ]"
     >
       {{ link.label }}

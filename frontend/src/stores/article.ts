@@ -6,12 +6,13 @@ import type { Article, ArticleCreate } from '@/api/types/article'
 export const useArticleStore = defineStore('article', () => {
   const articles = ref<Article[]>([])
   const isLoading = ref(false)
+  const isCreating = ref(false)
   const error = ref<string | null>(null)
 
   async function fetchArticles() {
     try {
       isLoading.value = true
-         error.value = null
+      error.value = null
 
       const response = await articleService.getAll(  )
       articles.value = response.data
@@ -22,10 +23,24 @@ export const useArticleStore = defineStore('article', () => {
     }
   }
 
+  async function createArticle(article: ArticleCreate) {
+    try {
+      isCreating.value = true
+      error.value = null
+      await articleService.create(article)
+    } catch (err) {
+      error.value = err instanceof Error ? err.message : 'An unknown error occurred'
+    } finally {
+      isCreating.value = false
+    }
+  }
+
   return {
     articles,
     isLoading,
+    isCreating,
     error,
     fetchArticles,
+    createArticle,
   }
 })
