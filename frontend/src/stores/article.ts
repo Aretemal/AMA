@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { ref, computed } from 'vue'
+import { ref } from 'vue'
 import { articleService } from '@/api/services/articleService'
 import type { Article, ArticleCreate } from '@/api/types/article'
 
@@ -35,11 +35,28 @@ export const useArticleStore = defineStore('article', () => {
     }
   }
 
+  async function deleteArticle(id: string, {
+    needUpdate = true
+  }: {
+    needUpdate?: boolean
+  } = {}) {
+    try {
+      error.value = null
+      await articleService.delete(id)
+      if (needUpdate) {
+        articles.value = articles.value.filter(article => article.id !== id)
+      }
+    } catch (err) {
+      error.value = err instanceof Error ? err.message : 'An unknown error occurred'
+    }
+  }
+
   return {
     articles,
     isLoading,
     isCreating,
     error,
+    deleteArticle,
     fetchArticles,
     createArticle,
   }

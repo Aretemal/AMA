@@ -10,8 +10,10 @@ class ArticleBase(BaseModel):
     author: str
 
 
-class ArticleCreate(ArticleBase):
-    pass
+class ArticleCreate(BaseModel):
+    title: str
+    content: Optional[str] = None
+    author: Optional[str] = None
 
 
 class ArticleUpdate(BaseModel):
@@ -20,8 +22,11 @@ class ArticleUpdate(BaseModel):
     author: Optional[str] = None
 
 
-class ArticleRead(ArticleBase):
+class ArticleRead(BaseModel):
     id: int
+    title: str
+    content: Optional[str] = None
+    author: Optional[str] = None
     created_at: datetime
     updated_at: datetime
 
