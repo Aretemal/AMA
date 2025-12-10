@@ -6,6 +6,7 @@ import Settings from '@/views/SettingsPage.vue'
 
 import { AppRoutes } from '../constants/appRoutes'
 import CreateArticleForm from '@/views/CreateArticleForm.vue'
+import EditArticleForm from '../views/EditArticleForm.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -25,6 +26,10 @@ const router = createRouter({
     {
       path: AppRoutes.CREATE_ARTICLE,
       component: CreateArticleForm,
+    },
+    {
+      path: AppRoutes.ARTICLE_DETAILS,
+      component: EditArticleForm,
     },
   ],
 })

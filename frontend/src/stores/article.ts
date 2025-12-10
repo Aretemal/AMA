@@ -1,10 +1,11 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { articleService } from '@/api/services/articleService'
-import type { Article, ArticleCreate } from '@/api/types/article'
+import type { Article, ArticleCreate, ArticleUpdate } from '@/api/types/article'
 
 export const useArticleStore = defineStore('article', () => {
   const articles = ref<Article[]>([])
+  const article = ref<Article | null>(null)
   const isLoading = ref(false)
   const isCreating = ref(false)
   const error = ref<string | null>(null)
@@ -14,7 +15,7 @@ export const useArticleStore = defineStore('article', () => {
       isLoading.value = true
       error.value = null
 
-      const response = await articleService.getAll(  )
+      const response = await articleService.getAll()
       articles.value = response.data
     } catch (err) {
       error.value = err instanceof Error ? err.message : 'An unknown error occurred'
@@ -51,13 +52,45 @@ export const useArticleStore = defineStore('article', () => {
     }
   }
 
+  async function fetchArticle(id: string) {
+    try {
+      error.value = null
+      const response = await articleService.getById(id)
+      article.value = response.data
+    } catch (err) {
+      error.value = err instanceof Error ? err.message : 'An unknown error occurred'
+    }
+  }
+
+  async function updateArticle(id: string, newArticle: ArticleUpdate, {
+    needUpdate = true
+  }: {
+    needUpdate?: boolean
+  } = {}) {
+    try {
+      error.value = null
+      await articleService.update(id, newArticle)
+      if (needUpdate) {
+        article.value = {
+          ...article.value,
+          ...newArticle,
+        } as Article | null
+      }
+    } catch (err) {
+      error.value = err instanceof Error ? err.message : 'An unknown error occurred'
+    }
+  }
+
   return {
+    article,
     articles,
     isLoading,
     isCreating,
     error,
+    fetchArticle,
     deleteArticle,
     fetchArticles,
     createArticle,
+    updateArticle,
   }
 })

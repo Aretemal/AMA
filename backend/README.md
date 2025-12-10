@@ -4,8 +4,17 @@
 
 ```bash
 cd backend
-python -m venv .venv
-.venv\Scripts\activate   # Windows
+python -m venv venv
+
+# Активация виртуального окружения:
+# Windows (PowerShell):
+.\venv\Scripts\Activate.ps1
+# Windows (CMD):
+venv\Scripts\activate.bat
+# Git Bash / Linux / Mac:
+source venv/Scripts/activate
+
+# Установка зависимостей:
 pip install -r requirements.txt
 ```
 
