@@ -14,6 +14,20 @@ class Settings(BaseSettings):
         "http://127.0.0.1:5173",
         "http://127.0.0.1:3000",
     ]
+    
+    # JWT настройки
+    SECRET_KEY: str = "your-secret-key-change-this-in-production-use-env-variable"
+    ALGORITHM: str = "HS256"
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
+    REFRESH_TOKEN_EXPIRE_DAYS: int = 7
+    
+    # Cookie настройки
+    COOKIE_ACCESS_TOKEN_NAME: str = "access_token"
+    COOKIE_REFRESH_TOKEN_NAME: str = "refresh_token"
+    COOKIE_DOMAIN: str | None = None
+    COOKIE_PATH: str = "/"
+    COOKIE_SECURE: bool = False
+    COOKIE_SAMESITE: str = "lax"
 
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
 

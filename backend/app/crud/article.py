@@ -14,8 +14,16 @@ def get_articles(db: Session, skip: int = 0, limit: int = 100) -> List[Article]:
     return db.query(Article).offset(skip).limit(limit).all()
 
 
-def create_article(db: Session, article_in: ArticleCreate) -> Article:
-    db_article = Article(**article_in.model_dump())
+def get_articles_by_user(db: Session, user_id: int, skip: int = 0, limit: int = 100) -> List[Article]:
+    """Получить статьи конкретного пользователя"""
+    return db.query(Article).filter(Article.user_id == user_id).offset(skip).limit(limit).all()
+
+
+def create_article(db: Session, article_in: ArticleCreate, user_id: int) -> Article:
+    """Создать статью с привязкой к пользователю"""
+    article_data = article_in.model_dump()
+    article_data["user_id"] = user_id
+    db_article = Article(**article_data)
     db.add(db_article)
     db.commit()
     db.refresh(db_article)

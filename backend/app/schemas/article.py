@@ -27,6 +27,7 @@ class ArticleRead(BaseModel):
     title: str
     content: Optional[str] = None
     author: Optional[str] = None
+    user_id: Optional[int] = None
     created_at: datetime
     updated_at: datetime
 
