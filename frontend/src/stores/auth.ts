@@ -2,37 +2,68 @@ import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import apiClient from '@/api/client'
 import type { User } from '@/api/types/user'
+import { ElNotification } from 'element-plus'
+import type { AxiosError } from 'axios'
 
 export const useAuthStore = defineStore('auth', () => {
   const user = ref<User | null>(null)
   const isLoading = ref(false)
+  const isCheckingAuth = ref(false)
   const error = ref<string | null>(null)
+  let checkAuthPromise: Promise<boolean> | null = null
 
   const isAuthenticated = computed(() => !!user.value)
 
   async function checkAuth() {
-    try {
-      isLoading.value = true
-      error.value = null
-      const { data } = await apiClient.get('/auth/me')
-      user.value = data
-      return true
-    } catch (error) {
-      user.value = null
-      return false
-    } finally {
-      isLoading.value = false
+    if (checkAuthPromise) {
+      return checkAuthPromise
     }
+
+    checkAuthPromise = (async () => {
+      try {
+        isCheckingAuth.value = true
+        error.value = null
+
+        const { data } = await apiClient.get('/auth/me')
+
+        user.value = data
+
+        return true
+      } catch (err) {
+        const axiosError = err as AxiosError<{ detail?: string }>
+        const errorCode = axiosError.code
+        if (errorCode === 'ECONNABORTED' || axiosError.message === 'Request aborted') {
+          return false
+        }
+
+        ElNotification({
+          message: 'Ошибка проверки авторизации! Поробуйте позже.',
+          type: 'error',
+          duration: 3000,
+        })
+
+        user.value = null
+
+        return false
+      } finally {
+        isCheckingAuth.value = false
+        checkAuthPromise = null
+      }
+    })()
+
+    return checkAuthPromise
   }
 
   async function login(email: string, password: string) {
     try {
       isLoading.value = true
       error.value = null
+
       const { data } = await apiClient.post('/auth/login', {
         email,
         password,
       })
+
       user.value = {
         id: data.user.id,
         email: data.user.email,
@@ -42,11 +73,16 @@ export const useAuthStore = defineStore('auth', () => {
         created_at: '',
         updated_at: '',
       }
+
       await checkAuth()
+
       return { success: true }
-    } catch (err: any) {
-      const errorMessage = err.response?.data?.detail || 'Login failed'
+    } catch (err) {
+      const axiosError = err as AxiosError<{ detail?: string }>
+      const errorMessage = axiosError.response?.data?.detail || 'Login failed'
+
       error.value = errorMessage
+
       return {
         success: false,
         error: errorMessage,
@@ -66,8 +102,9 @@ export const useAuthStore = defineStore('auth', () => {
         username,
       })
       return { success: true, user: data }
-    } catch (err: any) {
-      const errorMessage = err.response?.data?.detail || 'Registration failed'
+    } catch (err) {
+      const axiosError = err as AxiosError<{ detail?: string }>
+      const errorMessage = axiosError.response?.data?.detail || 'Registration failed'
       error.value = errorMessage
       return {
         success: false,
@@ -80,10 +117,15 @@ export const useAuthStore = defineStore('auth', () => {
 
   async function logout() {
     try {
-      await apiClient.post('/auth/logout')
-      user.value = null
+      await apiClient.post('/auth/logout');
       error.value = null
-    } catch (error) {
+    } catch {
+      ElNotification({
+        message: 'Ошибка выхода! Поробуйте позже.',
+        type: 'error',
+        duration: 3000,
+      })
+    } finally {
       user.value = null
     }
   }
@@ -91,6 +133,7 @@ export const useAuthStore = defineStore('auth', () => {
   return {
     user,
     isLoading,
+    isCheckingAuth,
     error,
     isAuthenticated,
     checkAuth,

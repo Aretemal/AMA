@@ -5,7 +5,6 @@ import 'element-plus/dist/index.css'
 import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 import App from './App.vue'
 import router from './router'
-import { useAuthStore } from './stores/auth'
 import './api/interceptors'
 import './index.css'
 
@@ -20,7 +19,5 @@ for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
   app.component(key, component)
 }
 
-const authStore = useAuthStore()
-authStore.checkAuth().then(() => {
-  app.mount('#app')
-})
+// Монтируем приложение сразу - роутер сам проверит авторизацию при первой навигации
+app.mount('#app')

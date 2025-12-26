@@ -91,8 +91,17 @@ def verify_auth_global(
     
     try:
         payload = decode_token(token)
-        user_id: int = payload.get("sub")
+        user_id_str: str = payload.get("sub")
         token_type: str = payload.get("type")
+        
+        # Преобразуем строку в int
+        try:
+            user_id: int = int(user_id_str)
+        except (ValueError, TypeError):
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid authentication credentials",
+            )
         
         if user_id is None:
             raise HTTPException(
@@ -129,10 +138,6 @@ def verify_auth_global(
 
 
 def get_user_from_request(request: Request) -> User:
-    """
-    Получает пользователя из request.state (используется после verify_auth_global).
-    Используется как dependency в роутах для доступа к пользователю.
-    """
     user = getattr(request.state, "user", None)
     if user is None:
         raise HTTPException(

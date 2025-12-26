@@ -4,8 +4,8 @@ import { useAuthStore } from '@/stores/auth'
 
 let isRefreshing = false
 let failedQueue: Array<{
-  resolve: (value?: any) => void
-  reject: (error?: any) => void
+  resolve: (value?: unknown) => void
+  reject: (error?: unknown) => void
 }> = []
 
 const processQueue = (error: AxiosError | null) => {
@@ -24,7 +24,12 @@ apiClient.interceptors.response.use(
   async (error: AxiosError) => {
     const originalRequest = error.config as InternalAxiosRequestConfig & { _retry?: boolean }
 
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    // Если это запрос на /auth/refresh и он получил 401, не пытаемся обновить токен (это приведет к бесконечному циклу)
+    if (originalRequest?.url?.includes('/auth/refresh')) {
+      return Promise.reject(error)
+    }
+
+    if (error.response?.status === 401 && originalRequest && !originalRequest._retry) {
       if (isRefreshing) {
         return new Promise((resolve, reject) => {
           failedQueue.push({ resolve, reject })

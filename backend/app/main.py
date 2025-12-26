@@ -19,8 +19,9 @@ def create_application() -> FastAPI:
         CORSMiddleware,
         allow_origins=settings.BACKEND_CORS_ORIGINS,
         allow_credentials=True,
-        allow_methods=["*"],  # Разрешить все методы (GET, POST, PUT, DELETE и т.д.)
-        allow_headers=["*"],  # Разрешить все заголовки
+        allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
+        allow_headers=["*"],
+        expose_headers=["*"],
     )
     
     application.include_router(api_router)

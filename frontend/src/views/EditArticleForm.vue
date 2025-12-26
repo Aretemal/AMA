@@ -11,8 +11,6 @@ const articleStore = useArticleStore()
 
 const formRef = ref()
 
-console.log(articleStore.article)
-
 const showDialog = ref(false)
 
 const router = useRouter()

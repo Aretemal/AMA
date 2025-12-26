@@ -16,15 +16,13 @@ def get_user_by_id(db: Session, user_id: int) -> Optional[User]:
 
 
 def create_user(db: Session, user_in: UserCreate) -> User:
-    # Проверяем, что пользователь с таким email не существует
     existing_user = get_user_by_email(db, user_in.email)
+
     if existing_user:
         raise ValueError("User with this email already exists")
     
-    # Хешируем пароль
     hashed_password = hash_password(user_in.password)
     
-    # Создаем пользователя
     db_user = User(
         email=user_in.email,
         username=user_in.username,

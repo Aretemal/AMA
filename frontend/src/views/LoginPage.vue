@@ -1,6 +1,28 @@
+<script setup lang="ts">
+import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+import { useAuthStore } from '@/stores/auth'
+import { AppRoutes } from '@/constants/appRoutes'
+import { Loading } from '@element-plus/icons-vue'
+
+const router = useRouter()
+const authStore = useAuthStore()
+
+const email = ref('')
+const password = ref('')
+
+async function handleLogin() {
+  const result = await authStore.login(email.value, password.value)
+
+  if (result.success) {
+    router.push(AppRoutes.HOME)
+  }
+}
+</script>
+
 <template>
   <div class="login-page">
-    <el-card class="login-card">
+    <el-card v-if="!authStore.isCheckingAuth" class="login-card">
       <template #header>
         <h2>Login</h2>
       </template>
@@ -33,11 +55,11 @@
             Login
           </el-button>
         </el-form-item>
-        <el-form-item>
+        <div>
           <el-link type="primary" @click="$router.push('/register')">
             Don't have an account? Register
           </el-link>
-        </el-form-item>
+        </div>
       </el-form>
       <el-alert
         v-if="authStore.error"
@@ -47,31 +69,16 @@
         style="margin-top: 20px"
       />
     </el-card>
+    <el-card v-else class="login-card">
+      <div style="text-align: center; padding: 40px;">
+        <el-icon class="is-loading" style="font-size: 32px;">
+          <Loading />
+        </el-icon>
+        <p style="margin-top: 16px;">Проверка авторизации...</p>
+      </div>
+    </el-card>
   </div>
 </template>
-
-<script setup lang="ts">
-import { ref } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
-import { useAuthStore } from '@/stores/auth'
-import { AppRoutes } from '@/constants/appRoutes'
-
-const router = useRouter()
-const route = useRoute()
-const authStore = useAuthStore()
-
-const email = ref('')
-const password = ref('')
-
-async function handleLogin() {
-  const result = await authStore.login(email.value, password.value)
-
-  if (result.success) {
-    const redirect = (route.query.redirect as string) || AppRoutes.HOME
-    router.push(redirect)
-  }
-}
-</script>
 
 <style scoped>
 .login-page {

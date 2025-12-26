@@ -1,6 +1,6 @@
 from datetime import timedelta
 
-from fastapi import APIRouter, Depends, HTTPException, Response, status
+from fastapi import APIRouter, Depends, HTTPException, Response, Request, status
 from sqlalchemy.orm import Session
 
 from app.auth.dependencies import get_user_from_request, verify_auth_global
@@ -13,10 +13,8 @@ from app.schemas.user import RefreshTokenRequest, Token, UserCreate, UserLogin, 
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
-
 @router.post("/register", response_model=UserRead, status_code=status.HTTP_201_CREATED)
 def register(user_in: UserCreate, db: Session = Depends(get_db)):
-    """Регистрация нового пользователя"""
     try:
         user = create_user(db, user_in)
         return user
@@ -33,7 +31,6 @@ def login(
     user_in: UserLogin,
     db: Session = Depends(get_db),
 ):
-    """Вход пользователя. Устанавливает токены в HTTP-only cookies."""
     user = authenticate_user(db, user_in.email, user_in.password)
     if not user:
         raise HTTPException(
@@ -48,10 +45,10 @@ def login(
     
     access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(
-        data={"sub": user.id},
+        data={"sub": str(user.id)},
         expires_delta=access_token_expires,
     )
-    refresh_token = create_refresh_token(data={"sub": user.id})
+    refresh_token = create_refresh_token(data={"sub": str(user.id)})
     
     response.set_cookie(
         key=settings.COOKIE_ACCESS_TOKEN_NAME,
@@ -91,7 +88,6 @@ def refresh_token(
     response: Response,
     db: Session = Depends(get_db),
 ):
-    """Обновление access токена. Читает refresh token из cookie."""
     refresh_token_value = request.cookies.get(settings.COOKIE_REFRESH_TOKEN_NAME)
     
     if not refresh_token_value:
@@ -103,7 +99,8 @@ def refresh_token(
     try:
         payload = decode_token(refresh_token_value)
         token_type: str = payload.get("type")
-        user_id: int = payload.get("sub")
+        user_id_str: str = payload.get("sub")
+        user_id: int = int(user_id_str)
         
         if token_type != "refresh":
             raise HTTPException(
@@ -120,11 +117,11 @@ def refresh_token(
         
         access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
         access_token = create_access_token(
-            data={"sub": user.id},
+            data={"sub": str(user.id)},
             expires_delta=access_token_expires,
         )
         
-        new_refresh_token = create_refresh_token(data={"sub": user.id})
+        new_refresh_token = create_refresh_token(data={"sub": str(user.id)})
         
         response.set_cookie(
             key=settings.COOKIE_ACCESS_TOKEN_NAME,
@@ -160,7 +157,6 @@ def refresh_token(
 
 @router.post("/logout", status_code=status.HTTP_200_OK)
 def logout(response: Response):
-    """Выход пользователя. Удаляет токены из cookies."""
     response.delete_cookie(
         key=settings.COOKIE_ACCESS_TOKEN_NAME,
         path=settings.COOKIE_PATH,
@@ -180,6 +176,5 @@ def logout(response: Response):
     dependencies=[Depends(verify_auth_global)],
 )
 def get_current_user_info(current_user: User = Depends(get_user_from_request)):
-    """Получить информацию о текущем пользователе"""
     return current_user
 

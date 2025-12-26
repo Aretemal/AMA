@@ -6,21 +6,18 @@ from passlib.context import CryptContext
 
 from app.core.config import settings
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+pwd_context = CryptContext(schemes=["argon2"], deprecated="auto")
 
 
 def hash_password(password: str) -> str:
-    """Хеширует пароль"""
     return pwd_context.hash(password)
 
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
-    """Проверяет пароль"""
     return pwd_context.verify(plain_password, hashed_password)
 
 
 def create_access_token(data: dict[str, Any], expires_delta: timedelta | None = None) -> str:
-    """Создает JWT токен"""
     to_encode = data.copy()
     if expires_delta:
         expire = datetime.utcnow() + expires_delta
@@ -33,7 +30,6 @@ def create_access_token(data: dict[str, Any], expires_delta: timedelta | None = 
 
 
 def create_refresh_token(data: dict[str, Any]) -> str:
-    """Создает refresh токен"""
     to_encode = data.copy()
     expire = datetime.utcnow() + timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS)
     to_encode.update({"exp": expire, "type": "refresh"})
@@ -42,7 +38,6 @@ def create_refresh_token(data: dict[str, Any]) -> str:
 
 
 def decode_token(token: str) -> dict[str, Any]:
-    """Декодирует и проверяет JWT токен"""
     try:
         payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
         return payload

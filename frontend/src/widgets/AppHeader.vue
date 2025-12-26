@@ -2,10 +2,12 @@
 import { AppRoutes } from '@/constants/appRoutes'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+import { computed } from 'vue'
 
 const route = useRoute()
 const router = useRouter()
 const authStore = useAuthStore()
+const isAuthenticated = computed(() => authStore.isAuthenticated)
 
 const links = [
   {
@@ -37,7 +39,7 @@ async function handleLogout() {
 </script>
 
 <template>
-  <nav class="w-full px-10 bg-white flex gap-4 items-center justify-between">
+  <nav v-if="isAuthenticated" class="w-full px-10 bg-white flex gap-4 items-center justify-between">
     <div class="flex gap-4">
       <RouterLink
         v-for="link in links"

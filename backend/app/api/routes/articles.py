@@ -21,7 +21,6 @@ def list_articles(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_user_from_request),
 ):
-    """Получить список статей текущего пользователя"""
     return article_crud.get_articles_by_user(db, user_id=current_user.id, skip=skip, limit=limit)
 
 
@@ -31,7 +30,6 @@ def create_article(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_user_from_request),
 ):
-    """Создать новую статью"""
     return article_crud.create_article(db, article_in, user_id=current_user.id)
 
 
@@ -41,7 +39,6 @@ def get_article(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_user_from_request),
 ):
-    """Получить статью по ID"""
     db_article = article_crud.get_article(db, article_id)
     if not db_article:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Article not found")
@@ -57,7 +54,6 @@ def update_article(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_user_from_request),
 ):
-    """Обновить статью"""
     db_article = article_crud.get_article(db, article_id)
     if not db_article:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Article not found")
@@ -72,7 +68,6 @@ def delete_article(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_user_from_request),
 ):
-    """Удалить статью"""
     db_article = article_crud.get_article(db, article_id)
     if not db_article:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Article not found")
