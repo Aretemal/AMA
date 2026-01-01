@@ -5,27 +5,34 @@ from pydantic import BaseModel
 
 
 class RecordBase(BaseModel):
-    user_id: int
     article_id: int
-    title: str
-    content: str
+    content: Optional[str] = None
+    type_record: Optional[str] = None
+    options: Optional[dict] = None
 
 
-class RecordCreate(RecordBase):
-    pass
+class RecordCreate(BaseModel):
+    article_id: int
+    content: Optional[str] = None
+    type_record: Optional[str] = None
+    options: Optional[dict] = None
 
 
 class RecordUpdate(BaseModel):
-    user_id: Optional[int] = None
     article_id: Optional[int] = None
-    title: Optional[str] = None
     content: Optional[str] = None
+    type_record: Optional[str] = None
+    options: Optional[dict] = None
 
 
-class RecordRead(RecordBase):
+class RecordRead(BaseModel):
     id: int
+    article_id: int
+    user_id: int
+    content: Optional[str] = None
+    type_record: Optional[str] = None
+    options: Optional[dict] = None
     created_at: datetime
 
-    class Config:
-        from_attributes = True
+    model_config = {"from_attributes": True}
 

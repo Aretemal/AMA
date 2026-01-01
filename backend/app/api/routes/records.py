@@ -21,7 +21,6 @@ def list_records(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_user_from_request),
 ):
-    """Получить список записей текущего пользователя"""
     return record_crud.get_records_by_user(db, user_id=current_user.id, skip=skip, limit=limit)
 
 
@@ -31,7 +30,6 @@ def create_record(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_user_from_request),
 ):
-    """Создать новую запись"""
     return record_crud.create_record(db, record_in, user_id=current_user.id)
 
 
@@ -41,7 +39,6 @@ def get_record(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_user_from_request),
 ):
-    """Получить запись по ID"""
     db_record = record_crud.get_record(db, record_id)
     if not db_record:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Record not found")
@@ -57,7 +54,6 @@ def update_record(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_user_from_request),
 ):
-    """Обновить запись"""
     db_record = record_crud.get_record(db, record_id)
     if not db_record:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Record not found")
@@ -72,7 +68,6 @@ def delete_record(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_user_from_request),
 ):
-    """Удалить запись"""
     db_record = record_crud.get_record(db, record_id)
     if not db_record:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Record not found")

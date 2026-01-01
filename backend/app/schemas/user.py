@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import List, Optional
 
 from pydantic import BaseModel, EmailStr
 
@@ -16,6 +17,8 @@ class UserRead(UserBase):
     id: int
     is_active: bool
     is_superuser: bool
+    song_ids: List[int] = [] 
+    album_ids: List[int] = []
     created_at: datetime
     updated_at: datetime
 

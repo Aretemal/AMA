@@ -1,5 +1,8 @@
+from pathlib import Path
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 
 from app.api.main import api_router
 from app.core.config import settings
@@ -23,6 +26,13 @@ def create_application() -> FastAPI:
         allow_headers=["*"],
         expose_headers=["*"],
     )
+    
+    # Создаем директорию для загрузок, если её нет
+    upload_dir = Path(settings.UPLOAD_DIR)
+    upload_dir.mkdir(parents=True, exist_ok=True)
+    
+    # Подключаем статическую раздачу файлов
+    application.mount(f"/{settings.UPLOAD_DIR_NAME}", StaticFiles(directory=str(upload_dir)), name="uploads")
     
     application.include_router(api_router)
     return application

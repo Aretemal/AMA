@@ -7,6 +7,10 @@ class Settings(BaseSettings):
     API_V1_STR: str = "/api"
     DATABASE_URL: str = "sqlite:///./app.db"
     
+    # Настройки для загрузки файлов
+    UPLOAD_DIR: str = "uploads/songs"  # Директория для сохранения файлов песен
+    UPLOAD_DIR_NAME: str = "uploads/songs"  # Имя директории для URL
+    
     # CORS настройки
     BACKEND_CORS_ORIGINS: list[str] = [
         "http://localhost:5173",  # Vite dev server

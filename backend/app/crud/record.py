@@ -20,9 +20,9 @@ def get_records_by_user(db: Session, user_id: int, skip: int = 0, limit: int = 1
 
 
 def create_record(db: Session, record_in: RecordCreate, user_id: int) -> Record:
-    """Создать запись с привязкой к пользователю"""
+    """Создать запись с привязкой к пользователю и статье"""
     record_data = record_in.model_dump()
-    record_data["user_id"] = user_id
+    record_data["user_id"] = user_id  # user_id устанавливается автоматически из current_user
     db_record = Record(**record_data)
     db.add(db_record)
     db.commit()
